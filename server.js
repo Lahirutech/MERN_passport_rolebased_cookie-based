@@ -1,4 +1,6 @@
 const express = require("express");
+const morgan = require("morgan")
+const bodyParser = require("body-parser")
 const app = express();
 const cors = require("cors");
 require("dotenv").config({ path: "./config.env" });
@@ -10,9 +12,16 @@ app.use(express.json());
 // get driver connection
 const dbo = require("./db/connection");
 
+//middleware
+app.use(morgan('dev'))
+
+//Routes
+
+
+
 app.listen(port, () => {
     // perform a database connection when server starts
-    dbo.connectToServer(function (err) {
+    dbo.connectToServer(function(err) {
         if (err) console.error(err);
     })
     console.log(`Server is running on port: ${port}`);
