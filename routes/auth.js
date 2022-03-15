@@ -2,15 +2,15 @@ const router = require('express').Router();
 
 const UsersController = require('../controllers/users');
 const User = require('../models/user.model');
+const { body, validationResult } = require('express-validator');
+
 
 router.get('/login', async(req, res, next) => {
     res.send("Login")
 })
-
 router.get('/register', async(req, res, next) => {
     res.send("Login")
 })
-
 router.post('/register', async(req, res, next) => {
     try {
         const { email } = req.body;
