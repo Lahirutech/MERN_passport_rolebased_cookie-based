@@ -4,7 +4,7 @@ const UsersController = require('../controllers/users');
 const User = require('../models/user.model');
 const { body, validationResult } = require('express-validator');
 const { registerSchema } = require('../schema/register-schema');
-const { validateRequestSchema } = require('../middleware/validate-request-schema');
+const validateRequestSchema = require('../middleware/validate-request-schema');
 
 router.get('/login', async(req, res, next) => {
     res.send("Login")
@@ -15,6 +15,16 @@ router.get('/register', async(req, res, next) => {
 router.post('/register', registerSchema,
     async(req, res, next) => {
         try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                errors.array().forEach((error) => {
+                    console.log('error', error.msg);
+                });
+                res.send(errors);
+
+                return;
+            }
+
             const { email } = req.body;
             const doesExist = await User.findOne({ email });
             console.log("doesExist", doesExist)
