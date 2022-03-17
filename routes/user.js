@@ -4,6 +4,7 @@ const UsersController = require('../controllers/users');
 const User = require('../models/user.model');
 
 router.get('/profile', async(req, res, next) => {
+    console.log("req.user", req.user)
     res.send("LogProfilein")
 })
 

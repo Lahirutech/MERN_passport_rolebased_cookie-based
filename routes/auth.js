@@ -10,9 +10,16 @@ const passport = require('passport')
 router.get('/login', async(req, res, next) => {
     res.send("Login")
 })
+
+router.get('/logout', async(req, res, next) => {
+    req.logOut()
+    res.redirect('/auth/login')
+})
+
 router.post('/login', passport.authenticate('local', {
     successRedirect: '/user/profile',
-    failureRedirect: '/auth/login'
+    failureRedirect: '/auth/login',
+    failureFlash: true,
 }))
 
 router.get('/register', async(req, res, next) => {
@@ -51,9 +58,6 @@ router.post('/register', registerSchema,
     })
 
 
-router.get('/logout', async(req, res, next) => {
-    req.logOut()
-})
 
 
 

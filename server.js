@@ -23,29 +23,18 @@ app.use(express.urlencoded({ extended: false }));
 //const MongoStore = connectMongo(session);
 
 //Init Session
-app.use(
-        session({
-            secret: process.env.SESSION_SECRET,
-            resave: false,
-            saveUninitialized: false,
-            cookie: {
-                secure: true,
-                httpOnly: true
-            },
-            //store: new MongoStore({ mongooseConnection: mongoose.connection }),
-
-        })
-    )
-    //for passport js authentication
+app.use(session({
+    secret: "123",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 60 * 60 * 24 * 1000 }
+}));
+//for passport js authentication
 app.use(passport.initialize())
 app.use(passport.session())
 require('./utils/passport.auth')
-
 app.use(connectFlash())
-
-const dbo = require("./db/connection");
-const { connect } = require("./routes/auth");
-//middleware
+    //middleware
 app.use(morgan('dev'))
     //Routes
 app.use('/auth', require('./routes/auth'))
