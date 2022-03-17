@@ -51,8 +51,8 @@ router.post('/register', registerSchema,
     })
 
 
-router.post('/login', async(req, res, next) => {
-    res.send("Login")
+router.get('/logout', async(req, res, next) => {
+    req.logOut()
 })
 
 
