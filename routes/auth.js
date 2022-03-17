@@ -5,10 +5,16 @@ const User = require('../models/user.model');
 const { body, validationResult } = require('express-validator');
 const { registerSchema } = require('../schema/register-schema');
 const validateRequestSchema = require('../middleware/validate-request-schema');
+const passport = require('passport')
 
 router.get('/login', async(req, res, next) => {
     res.send("Login")
 })
+router.post('/login', passport.authenticate('local', {
+    successRedirect: '/user/profile',
+    failureRedirect: '/auth/login'
+}))
+
 router.get('/register', async(req, res, next) => {
     res.send("register")
 })

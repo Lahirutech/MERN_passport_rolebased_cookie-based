@@ -5,6 +5,7 @@ const createHttpError = require('http-errors');
 const mongoose = require("mongoose")
 const session = require('express-session');
 const connectFlash = require('connect-flash');
+const passport = require('passport')
 
 
 const app = express();
@@ -23,18 +24,23 @@ app.use(express.urlencoded({ extended: false }));
 
 //Init Session
 app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            secure: true,
-            httpOnly: true
-        },
-        //store: new MongoStore({ mongooseConnection: mongoose.connection }),
+        session({
+            secret: process.env.SESSION_SECRET,
+            resave: false,
+            saveUninitialized: false,
+            cookie: {
+                secure: true,
+                httpOnly: true
+            },
+            //store: new MongoStore({ mongooseConnection: mongoose.connection }),
 
-    })
-)
+        })
+    )
+    //for passport js authentication
+app.use(passport.initialize())
+app.use(passport.session())
+require('./utils/passport.auth')
+
 app.use(connectFlash())
 
 const dbo = require("./db/connection");
@@ -43,7 +49,7 @@ const { connect } = require("./routes/auth");
 app.use(morgan('dev'))
     //Routes
 app.use('/auth', require('./routes/auth'))
-app.use('/users', require('./routes/user'))
+app.use('/user', require('./routes/user'))
 
 
 // 404 Handler
