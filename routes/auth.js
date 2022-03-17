@@ -22,7 +22,6 @@ router.post('/register', registerSchema,
                 });
                 return res.status(400).json({ errors: errors.array() });
             }
-
             const { email } = req.body;
             const doesExist = await User.findOne({ email });
             console.log("doesExist", doesExist)
