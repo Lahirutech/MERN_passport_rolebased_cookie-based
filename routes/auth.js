@@ -20,9 +20,7 @@ router.post('/register', registerSchema,
                 errors.array().forEach((error) => {
                     console.log('error', error.msg);
                 });
-                res.send(errors);
-
-                return;
+                return res.status(400).json({ errors: errors.array() });
             }
 
             const { email } = req.body;
