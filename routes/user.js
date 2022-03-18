@@ -8,8 +8,8 @@ router.get('/profile', async(req, res, next) => {
     res.send("LogProfilein")
 })
 
-router.get('/register', async(req, res, next) => {
-    res.send("Login")
+router.get('/userdata', async(req, res, next) => {
+    res.send("Userdata")
 })
 
 router.post('/register', async(req, res, next) => {

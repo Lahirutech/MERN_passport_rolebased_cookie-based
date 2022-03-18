@@ -6,6 +6,9 @@ const mongoose = require("mongoose")
 const session = require('express-session');
 const connectFlash = require('connect-flash');
 const passport = require('passport')
+const connectMongo = require('connect-mongo');
+const { ensureLoggedIn } = require('connect-ensure-login');
+
 
 
 const app = express();
@@ -16,18 +19,22 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+//const MongoStore = new connectMongo(session);
+
 
 // app.use(require("./routes/record"));
 // get driver connection
 
-//const MongoStore = connectMongo(session);
 
 //Init Session
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 60 * 60 * 24 * 1000 }
+    cookie: { maxAge: 60 * 60 * 24 * 1000 },
+    store: connectMongo.create({
+        mongoUrl: process.env.ATLAS_URI
+    })
 }));
 //for passport js authentication
 app.use(passport.initialize())
@@ -38,8 +45,7 @@ app.use(connectFlash())
 app.use(morgan('dev'))
     //Routes
 app.use('/auth', require('./routes/auth'))
-app.use('/user', ensureAuthenticated, require('./routes/user'))
-
+app.use('/user', ensureLoggedIn({ redirectTo: '/auth/login' }), require('./routes/user'))
 
 // 404 Handler
 app.use((req, res, next) => {
@@ -57,9 +63,6 @@ app.use((req, res, next) => {
     res.locals.user = req.user
     next()
 })
-
-
-
 mongoose
     .connect(process.env.ATLAS_URI, {
         useNewUrlParser: true,
