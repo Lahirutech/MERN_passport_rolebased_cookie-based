@@ -38,7 +38,7 @@ app.use(connectFlash())
 app.use(morgan('dev'))
     //Routes
 app.use('/auth', require('./routes/auth'))
-app.use('/user', require('./routes/user'))
+app.use('/user', ensureAuthenticated, require('./routes/user'))
 
 
 // 404 Handler
@@ -53,6 +53,13 @@ app.use((error, req, res, next) => {
     res.send(error)
 });
 
+app.use((req, res, next) => {
+    res.locals.user = req.user
+    next()
+})
+
+
+
 mongoose
     .connect(process.env.ATLAS_URI, {
         useNewUrlParser: true,
@@ -64,3 +71,12 @@ mongoose
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
+
+function ensureAuthenticated(req, res, next) {
+    console.log("check authenticated", req.isAuthenticated())
+    if (req.isAuthenticated()) {
+        next()
+    } else {
+        res.redirect('/auth/login')
+    }
+}
