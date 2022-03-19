@@ -6,10 +6,13 @@ const { body, validationResult } = require('express-validator');
 const { registerSchema } = require('../schema/register-schema');
 const validateRequestSchema = require('../middleware/validate-request-schema');
 const passport = require('passport')
+const { ensureLoggedOut, ensureLoggedIn } = require('connect-ensure-login');
 
-router.get('/login', async(req, res, next) => {
-    res.send("Login")
-})
+
+router.get('/login',
+    ensureLoggedOut({ redirectTo: '/' }), async(req, res, next) => {
+        res.send("Login")
+    })
 
 router.get('/logout', async(req, res, next) => {
     req.logOut()
@@ -17,7 +20,8 @@ router.get('/logout', async(req, res, next) => {
 })
 
 router.post('/login', passport.authenticate('local', {
-    successRedirect: '/user/profile',
+    // successRedirect: '/user/profile',
+    successReturnToOrRedirect: '/',
     failureRedirect: '/auth/login',
     failureFlash: true,
 }))
