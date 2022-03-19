@@ -8,7 +8,8 @@ const connectFlash = require('connect-flash');
 const passport = require('passport')
 const connectMongo = require('connect-mongo');
 const { ensureLoggedIn } = require('connect-ensure-login');
-
+const { roles } = require("./utils/constants");
+const { ensureAdmin } = require("./utils/permissions");
 
 
 const app = express();
@@ -18,13 +19,6 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-//const MongoStore = new connectMongo(session);
-
-
-// app.use(require("./routes/record"));
-// get driver connection
-
 
 //Init Session
 app.use(session({
@@ -43,9 +37,17 @@ require('./utils/passport.auth')
 app.use(connectFlash())
     //middleware
 app.use(morgan('dev'))
-    //Routes
+
+//Routes
 app.use('/auth', require('./routes/auth'))
 app.use('/user', ensureLoggedIn({ redirectTo: '/auth/login' }), require('./routes/user'))
+app.use('/admin', ensureLoggedIn({ redirectTo: '/auth/login' }), async(req, res, next) => {
+        ensureAdmin(req, res, next);
+    },
+    require('./routes/admin.route'))
+app.use('/', require('./routes/index.route'));
+
+
 
 // 404 Handler
 app.use((req, res, next) => {
@@ -75,11 +77,30 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
-function ensureAuthenticated(req, res, next) {
-    console.log("check authenticated", req.isAuthenticated())
-    if (req.isAuthenticated()) {
-        next()
+// function ensureAuthenticated(req, res, next) {
+//     console.log("check authenticated", req.isAuthenticated())
+//     if (req.isAuthenticated()) {
+//         next()
+//     } else {
+//         res.redirect('/auth/login')
+//     }
+// }
+
+// function ensureAdmin(req, res, next) {
+//     console.log("check authenticated", req.isAuthenticated())
+//     if (req.user.role === roles.admin) {
+//         next()
+//     } else {
+//         res.redirect('/auth/login')
+//     }
+// }
+
+
+function ensureModerator(req, res, next) {
+    if (req.user.role === roles.moderator) {
+        next();
     } else {
-        res.redirect('/auth/login')
+        //req.flash('warning', 'you are not Authorized to see this route');
+        res.redirect('/');
     }
 }
