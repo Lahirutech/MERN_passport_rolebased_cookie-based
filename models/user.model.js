@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt')
 const createHttpError = require('http-errors');
+const { roles } = require('../utils/constants');
+
 
 const UserSchema = new mongoose.Schema({
     email: {
@@ -12,6 +14,11 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    role: {
+        type: String,
+        enum: [roles.admin, roles.moderator, roles.client],
+        default: roles.client
     }
 })
 
