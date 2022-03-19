@@ -10,7 +10,6 @@ router.get('/users', async(req, res, next) => {
         next(error)
     }
 })
-
 router.get('/user/:id', async(req, res, next) => {
     try {
         const { id } = req.params
@@ -60,19 +59,5 @@ router.post('/update-role', async(req, res, next) => {
         next(error);
     }
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 module.exports = router

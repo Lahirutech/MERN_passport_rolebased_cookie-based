@@ -15,10 +15,9 @@ const { ensureAdmin } = require("./utils/permissions");
 const app = express();
 const cors = require("cors");
 require("dotenv").config({ path: "./config.env" });
+
 const port = process.env.PORT || 5000;
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
 
 //Init Session
 app.use(session({
@@ -30,31 +29,21 @@ app.use(session({
         mongoUrl: process.env.ATLAS_URI
     })
 }));
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
 //for passport js authentication
 app.use(passport.initialize())
 app.use(passport.session())
 require('./utils/passport.auth')
 app.use(connectFlash())
-    //middleware
+
+
+//middleware
 app.use(morgan('dev'))
-
-//Routes
-app.use('/auth', require('./routes/auth'))
-app.use('/user', ensureLoggedIn({ redirectTo: '/auth/login' }), require('./routes/user'))
-app.use('/admin', ensureLoggedIn({ redirectTo: '/auth/login' }), async(req, res, next) => {
-        ensureAdmin(req, res, next);
-    },
-    require('./routes/admin.route'))
-app.use('/', require('./routes/index.route'));
-
-
-
-// 404 Handler
-app.use((req, res, next) => {
-    next(createHttpError.NotFound());
-});
-
-// Error Handler
+    // Error Handler
 app.use((error, req, res, next) => {
     error.status = error.status || 500;
     res.status(error.status);
@@ -65,6 +54,23 @@ app.use((req, res, next) => {
     res.locals.user = req.user
     next()
 })
+
+//Routes
+app.use('/auth', require('./routes/auth.route'))
+app.use('/user', ensureLoggedIn({ redirectTo: '/auth/login' }), require('./routes/user.route'))
+
+app.use('/admin', ensureLoggedIn({ redirectTo: '/auth/login' }), async(req, res, next) => {
+        ensureAdmin(req, res, next);
+    },
+    require('./routes/admin.route'))
+app.use('/', require('./routes/index.route'));
+
+// 404 Handler
+app.use((req, res, next) => {
+    next(createHttpError.NotFound());
+});
+
+
 mongoose
     .connect(process.env.ATLAS_URI, {
         useNewUrlParser: true,
@@ -94,13 +100,3 @@ app.listen(port, () => {
 //         res.redirect('/auth/login')
 //     }
 // }
-
-
-function ensureModerator(req, res, next) {
-    if (req.user.role === roles.moderator) {
-        next();
-    } else {
-        //req.flash('warning', 'you are not Authorized to see this route');
-        res.redirect('/');
-    }
-}
